@@ -1,9 +1,225 @@
-root = true
+import java.util.ArrayList;
+import java.util.List;
+//import java.util.Scanner;
+import java.awt.event.KeyEvent;
 
-[*]
-indent_style = space
-indent_size = 2
-end_of_line = lf
-charset = utf-8
-trim_trailing_whitespace = true
-insert_final_newline = true
+// Define the dimensions of the game board
+public static final int ROWS = 3;
+public static final int COLS = 3;
+
+// The game board
+List<List<String>> gameBoard = new ArrayList<>();
+
+// The players
+String[] players = {"X", "O"};
+int g = 0;
+    int x = ' ';
+    int y = ' ';
+// The index of the current player
+int currentPlayerIndex;
+
+// The available cells on the game board
+List<PVector> available = new ArrayList<>();
+
+
+//Scanner userInput = new Scanner(System.in);
+
+void setup() {
+  size(500, 500);
+
+  // Initialize the game board with empty cells
+  for (int i = 0; i < ROWS; i++) {
+    gameBoard.add(new ArrayList<>());
+    for (int j = 0; j < COLS; j++) {
+      gameBoard.get(i).add("");
+    }
+  }
+
+  // Choose a random player to start the game
+  currentPlayerIndex = floor(random(players.length));
+
+  // Add all the cells to the list of available cells
+  for (int j = 0; j < 3; j++) {
+    for (int i = 0; i < 3; i++) {
+      available.add(new PVector(i, j));
+    }
+  }
+  //userInput = new Scanner(System.in);
+   System.out.println("Please enter 9 to start the game");
+}
+
+
+  void keyPressed(){
+
+
+
+    switch(keyCode){
+      case KeyEvent.VK_0:
+      System.out.println("O");
+      x = 0;
+      y = 0;
+      break;
+      case KeyEvent.VK_1:
+      System.out.println("1");
+      x = 1;
+      y = 0;
+      break;
+      case KeyEvent.VK_2:
+      System.out.println("2");
+      x = 2;
+      y = 0;
+      break;
+      case KeyEvent.VK_3:
+      System.out.println("3");
+      x = 0;
+      y = 1;
+      break;
+      case KeyEvent.VK_4:
+      System.out.println("4");
+      x = 1;
+      y = 1;
+      break;
+      case KeyEvent.VK_5:
+      System.out.println("5");
+      x = 2;
+      y = 1;
+      break;
+      case KeyEvent.VK_6:
+      System.out.println("6");
+      x = 0;
+      y = 2;
+      break;
+      case KeyEvent.VK_7:
+      System.out.println("7");
+      x = 1;
+      y = 2;
+      break;
+      case KeyEvent.VK_8:
+      System.out.println("8");
+      x = 2;
+      y = 2;
+      break;
+      case KeyEvent.VK_9:
+      if( g < 1 ){
+  int index = floor(random(available.size()));
+  PVector spot = available.get(index);
+  available.remove(index);
+  int i = (int) spot.x;
+  int j = (int) spot.y;
+
+  gameBoard.get(i).set(j, players[currentPlayerIndex]);
+  currentPlayerIndex = (currentPlayerIndex+1) % players.length;
+  g++;
+      }
+        System.out.println("Please enter key from 0-8");
+        return;
+
+
+  }
+
+  available.remove(x);
+  gameBoard.get(x).set(y, players[currentPlayerIndex]);
+  currentPlayerIndex = (currentPlayerIndex+1) % players.length;
+
+
+  int index = floor(random(available.size()));
+  PVector spot = available.get(index);
+  available.remove(index);
+  int i = (int) spot.x;
+  int j = (int) spot.y;
+
+  gameBoard.get(i).set(j, players[currentPlayerIndex]);
+  currentPlayerIndex = (currentPlayerIndex+1) % players.length;
+
+  System.out.println(available);
+
+
+  }
+
+
+// Check if three cells are the same
+boolean checkThreeInARow(String a, String b, String c) {
+  return (a == b && b == c && a != "");
+}
+
+// Check if a player has won the game
+String checkWinner() {
+  String winner = null;
+
+  // Check the rows for a win
+  for (int i = 0; i < ROWS; i++) {
+    if (checkThreeInARow(gameBoard.get(i).get(0), gameBoard.get(i).get(1), gameBoard.get(i).get(2))) {
+      winner = gameBoard.get(i).get(0);
+    }
+  }
+
+  // Check the columns for a win
+  for (int i = 0; i < COLS; i++) {
+    if (checkThreeInARow(gameBoard.get(0).get(i), gameBoard.get(1).get(i), gameBoard.get(2).get(i))){
+      winner = gameBoard.get(0).get(i);
+    }
+  }
+  // Diagonal
+  if (checkThreeInARow(gameBoard.get(0).get(0), gameBoard.get(1).get(1), gameBoard.get(2).get(2))){
+    winner = gameBoard.get(0).get(0);
+  }
+  if (checkThreeInARow(gameBoard.get(2).get(0), gameBoard.get(1).get(1), gameBoard.get(0).get(2))) {
+    winner = gameBoard.get(2).get(0);
+  }
+
+  if (winner == null && available.size() == 0) {
+    return "tie";
+  } else {
+    return winner;
+  }
+}
+
+//void nextTurn() {
+  //int index = floor(random(available.size()));
+
+  //PVector spot = available.get(index);
+  //available.remove(index);
+  //int i = (int) spot.x;
+  //int j = (int) spot.y;
+  //gameBoard.get(i).set(j, players[currentPlayerIndex]);
+  //currentPlayerIndex = (currentPlayerIndex + 1) % players.length;
+//}
+
+void draw() {
+  background(255);
+  float w = width / 3;
+  float h = height / 3;
+  strokeWeight(4);
+
+  line(w, 0, w, height);
+  line(w * 2, 0, w * 2, height);
+  line(0, h, width, h);
+  line(0, h * 2, width, h * 2);
+
+  for (int j = 0; j < 3; j++) {
+    for (int i = 0; i < 3; i++) {
+      float x = w * i + w / 2;
+      float y = h * j + h / 2;
+      String spot = gameBoard.get(i).get(j);
+      textSize(32);
+      if (spot == players[1]) {
+        noFill();
+        ellipse(x, y, w / 2, w / 2);
+      } else if (spot == players[0]) {
+        float xr = w / 4;
+        line(x - xr, y - xr, x + xr, y + xr);
+        line(x + xr, y - xr, x - xr, y + xr);
+      }
+    }
+  }
+
+  String result = checkWinner();
+  if (result != null) {
+    noLoop();
+    if (result == "tie") {
+      println("Tie!");
+    } else {
+      println(result + " wins!");
+    }
+  }
+}
